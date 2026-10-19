@@ -1,0 +1,21 @@
+# Production overrides: no hot-reload, no source bind-mounts,
+# and nginx only reachable from the host (the host's reverse proxy handles TLS).
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+services:
+  app1:
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    volumes: !reset []
+    restart: unless-stopped
+  app2:
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    volumes: !reset []
+    restart: unless-stopped
+  app3:
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    volumes: !reset []
+    restart: unless-stopped
+
+  nginx:
+    ports: !override
+      - "127.0.0.1:8080:8000"
+    restart: unless-stopped
