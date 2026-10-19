@@ -1,0 +1,24 @@
+# Edge proxy — ONE per server, shared by every app. nginx version of the
+# Caddy edge in fixcore_net_selfhost/edge; same "edge" network and certs.
+#   docker compose up -d --remove-orphans                 # switch over / start
+#   docker compose exec nginx nginx -s reload             # after editing nginx.conf
+#
+# An app joins by putting one container on the external "edge" network with an
+# alias, then adding a server block for its hostname to ./nginx.conf.
+name: edge
+
+services:
+  nginx:
+    image: nginx:1.28-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/certs:ro
+    networks: [edge]
+    restart: unless-stopped
+
+networks:
+  edge:
+    name: edge
